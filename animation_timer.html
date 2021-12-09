@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sandbox</title>
+    <style>
+      #field {
+        height: 200px;
+        border-bottom: 3px black groove;
+        position: relative;
+      }
+
+      #ball {
+        position: absolute;
+        cursor: pointer;
+      }
+    </style>
+</head>
+<body>
+  <div id="time">5:00</div>
+  <script type="text/javascript">
+    const TIMER = 5*60*1000; // 5 minutes
+
+    /**
+     * Creates JS animation with defined duration and draw function, plus
+     * optional timing function. 
+     * 
+     * @param  {int} duration - animation durateion in ms.
+     * @param  {function} drawFunction - function that draws frames based on
+     *                                   progess (float from 0 to 1).
+     * @param  {function} [timingFunction] - optional function that returns
+     *                                       progress based on time fraction
+     *                                       (float from 0 to 1). If not set,
+     *                                       linear is used as default.
+     * @return {void}
+     */
+    const animate = function (duration, drawFunction, timingFunction) {
+      let start = performance.now();
+
+      if (typeof(timingFunction) !== "function") {
+        timingFunction = (timeFraction) => timeFraction;
+      }
+
+      requestAnimationFrame(function animate (time) {
+        let timeFraction = (time - start) / duration;
+
+        if (timeFraction > 1) {
+          timeFraction = 1;
+        }
+
+        drawFunction(timingFunction(timeFraction));
+
+        if (timeFraction < 1) {
+          requestAnimationFrame(animate);
+        }
+      });
+    };
+
+    const addLeadingZero = function (number, chars) {
+      const charsToBeAdded = chars - number.toString().length;
+
+      if (charsToBeAdded > 0) {
+        return `0`.repeat(charsToBeAdded) + number; 
+      }
+      return number;
+    }
+
+    const timerFunction = function (progress) {
+      const counterElement = document.querySelector(`#time`);
+      const currentTime = new Date(Math.floor((1 - progress) * TIMER));
+
+
+      counterElement.textContent =
+        currentTime.getMinutes() + ":" +
+        addLeadingZero(currentTime.getSeconds(), 2);
+    }
+
+    animate(TIMER, timerFunction);
+  </script>
+</body>
+</html>

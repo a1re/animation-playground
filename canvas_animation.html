@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas Animation</title>
+  <script type="text/javascript" src="animation.js"></script>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script type="text/javascript">
+    const canvas = document.querySelector('#canvas');
+
+    if (canvas.getContext) {
+      const ctx = canvas.getContext('2d');
+
+      ctx.canvas.width = 1200;
+      ctx.canvas.height = 600;
+      ctx.canvas.style.width = '600px';
+      ctx.canvas.style.height = '300px';
+
+      ctx.scale(2, 2);
+
+      function drawCircle (ctx, x, y, r, color) {
+
+        ctx.beginPath();
+        ctx.fillStyle = color
+        ctx.arc(x, y, r, 0 * Math.PI, 2 * Math.PI);
+        ctx.fill();
+      }
+
+      function easeBounce(timeFraction) {
+        const n1 = 7.5625;
+        const d1 = 2.75;
+
+        if (timeFraction < 1 / d1) {
+          return n1 * timeFraction * timeFraction;
+        } else if (timeFraction < 2 / d1) {
+          return n1 * (timeFraction -= 1.5 / d1) * timeFraction + 0.75;
+        } else if (timeFraction < 2.5 / d1) {
+          return n1 * (timeFraction -= 2.25 / d1) * timeFraction + 0.9375;
+        } else {
+          return n1 * (timeFraction -= 2.625 / d1) * timeFraction + 0.984375;
+        }
+      }
+
+      ballAnimation = new window.Animation({
+        duration: 2000,
+        renderFunction: (progress) => {
+          ctx.clearRect(0, 0, 600, 300);
+          const x = 51 + progress * (600 - 51 * 2);
+          const y = 51 + easeBounce(progress) * (300 - 51 * 2);
+          drawCircle(ctx, x, y, 50, '#336699');
+        },
+        fps: 60
+      });
+      ballAnimation.start();
+    }
+  </script>
+  
+</body>
+</html>

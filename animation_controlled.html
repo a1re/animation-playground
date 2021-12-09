@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Controlled animation</title>
+  <style>
+    body {
+      background-color: #333;
+      color: #ccc;
+      font-family: "Fira Code", monotype;
+    }
+  </style>
+</head>
+<body>
+  <div id="time">01:00</div>
+  <script type="text/javascript">
+    const Animation = function ({duration, timingFunction, renderFunction, endingFunction, fps}) {
+      if (!fps) {
+        fps = 24;
+      }
+
+      if (typeof timingFunction !== `function`) {
+        timingFunction = (timeFraction) => timeFraction;
+      }
+
+      if (typeof renderFunction === `function`) {
+        this.renderFunction = renderFunction;
+      }
+
+      if (typeof endingFunction === `function`) {
+        this.endingFunction = endingFunction;
+      }
+
+      this.duration = duration;
+      this.timingFunction = timingFunction;
+      this.fps = fps;
+
+      this._isRunning = false;
+      this._previousFrameTime = 0;
+
+      this.renderFrame = this.renderFrame.bind(this);
+    }
+
+    Animation.prototype.start = function () {
+      this.start = performance.now();
+      this._isRunning = true;
+      
+      requestAnimationFrame(this.renderFrame);
+    }
+
+    Animation.prototype.renderFrame = function (time) {
+      if (!this._isRunning || (this.start + this.duration) < time) {
+        if (this.endFunction) {
+          this.endFunction();
+        }
+        return;
+      }
+
+      const timeFraction = (time - this.start) / this.duration;
+      if (timeFraction > 1) {
+        timeFraction = 1;
+        this.isRunning = false
+      }
+
+      const elapsed = time - this._previousFrameTime;
+
+      if (elapsed > (1000 / this.fps)) {
+        if (this.renderFunction) {
+          this.renderFunction(this.timingFunction(timeFraction));
+        }
+        this._previousFrameTime = time;
+      }
+      requestAnimationFrame(this.renderFrame);
+    }
+
+    Animation.prototype.stop = function () {
+      this._isRunning = false;
+    }
+
+    const animateTime = new Animation({
+      duration: 60000,
+      fps: 10,
+      renderFunction: (progress) => {
+        const timer = document.querySelector(`#time`);
+        const currentTime = new Date(Math.floor((1 - progress) * 60000));
+
+        timer.textContent = currentTime.getMinutes() + ":" + currentTime.getSeconds();
+      }
+    });
+    animateTime.start();
+    setTimeout(() => { animateTime.stop(); }, 15000);
+  </script>
+</body>
+</html>

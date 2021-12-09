@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SetInterval Playground</title>
+  <style type="text/css">
+    body {
+      position: relative;
+    }
+
+    #block {
+      position: absolute;
+      left: 0;
+      top: 15px;
+
+      width: 100px;
+      height: 100px;
+      background: blue;
+    }
+  </style>
+</head>
+<body>
+  <div id="block"></div>
+  <script type="text/javascript">
+    let block = document.querySelector("#block");
+
+    block.addEventListener("click", () => {
+      let start = Date.now();
+
+      let timer = setInterval(() => {
+        let timePassed = Date.now() - start;
+
+        block.style.left = timePassed / 5 + "px";
+        block.style.top = (15 + timePassed / 10) + "px";
+
+        if (timePassed > 2000) {
+          clearInterval(timer);
+        }
+      }, 4);
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sandbox</title>
+    <style>
+      #field {
+        height: 200px;
+        border-bottom: 3px black groove;
+        position: relative;
+      }
+
+      #ball {
+        position: absolute;
+        cursor: pointer;
+      }
+    </style>
+</head>
+<body>
+  <div id="field">
+    <img src="https://en.js.cx/clipart/ball.svg" width="40" height="40" id="ball">
+  </div>
+  <script type="text/javascript">
+    const animate = function (element, {style, from, to, duration}, timingFunction) {
+      let start = performance.now();
+
+      if (typeof(timingFunction) !== "function") {
+        timingFunction = (timeFraction) => timeFraction;
+      }
+
+      const getUnit = function (value) {
+        const matches = /[a-z%]+$/.exec(value);
+        if (matches.length > 0) {
+          return matches[0];
+        } 
+        return "";
+      };
+
+      const drawFunction = function (element, progress) {
+        if (from === undefined) {
+          from = 0;
+        }
+        const unit = getUnit(to);
+        const value = (parseInt(to, 10) - parseInt(from, 10)) * progress;
+        element.style[style] = value + unit;
+      };
+
+      requestAnimationFrame(function animate (time) {
+        let timeFraction = (time - start) / duration;
+
+        if (timeFraction > 1) {
+          timeFraction = 1;
+        }
+
+        drawFunction(element, timingFunction(timeFraction));
+
+        if (timeFraction < 1) {
+          requestAnimationFrame(animate);
+        }
+      });
+    }
+
+    const bounceOut = function (x) {
+      const n1 = 7.5625;
+      const d1 = 2.75;
+
+      if (x < 1 / d1) {
+        return n1 * x * x;
+      } else if (x < 2 / d1) {
+        return n1 * (x -= 1.5 / d1) * x + 0.75;
+      } else if (x < 2.5 / d1) {
+        return n1 * (x -= 2.25 / d1) * x + 0.9375;
+      } else {
+        return n1 * (x -= 2.625 / d1) * x + 0.984375;
+      }
+    };
+
+    const ball = document.querySelector("#ball");
+
+    animate(ball, {style: "top", from: "0px", to: "160px", duration: 1500}, bounceOut);
+    animate(ball, {style: "left", from: "0px", to: "250px", duration: 1500});
+
+  </script>
+</body>
+</html>

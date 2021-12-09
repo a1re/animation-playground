@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sandbox</title>
+    <style>
+      #field {
+        height: 200px;
+        border-bottom: 3px black groove;
+        position: relative;
+      }
+
+      #ball {
+        position: absolute;
+        cursor: pointer;
+      }
+    </style>
+</head>
+<body>
+  <div id="field">
+    <img src="https://en.js.cx/clipart/ball.svg" width="40" height="40" id="ball">
+  </div>
+  <script type="text/javascript">
+    /**
+     * Creates JS animation with defined duration and draw functions, and
+     * optional timing function. 
+     * 
+     * @param  {int} duration - animation durateion in ms.
+     * @param  {function} drawFunction - function that draws frames based on
+     *                                   progess (float from 0 to 1).
+     * @param  {function} [timingFunction] - optional function that returns
+     *                                       progress based on time fraction
+     *                                       (float from 0 to 1). If not set,
+     *                                       linear is used as default.
+     * @return {void}
+     */
+    const animate = function (duration, drawFunction, timingFunction) {
+      let start = performance.now();
+
+      if (typeof(timingFunction) !== "function") {
+        timingFunction = (timeFraction) => timeFraction;
+      }
+
+      requestAnimationFrame(function animate (time) {
+        let timeFraction = (time - start) / duration;
+
+        if (timeFraction > 1) {
+          timeFraction = 1;
+        }
+
+        drawFunction(timingFunction(timeFraction));
+
+        if (timeFraction < 1) {
+          requestAnimationFrame(animate);
+        }
+      });
+    }
+
+    const moveBall = function (progress) {
+      const ball = document.querySelector("#ball");
+      //console.log(progress);
+      ball.style.top = (progress * 160) + 'px';
+    }
+
+    const bounceOut = function (x) {
+      const n1 = 7.5625;
+      const d1 = 2.75;
+
+      if (x < 1 / d1) {
+        return n1 * x * x;
+      } else if (x < 2 / d1) {
+        return n1 * (x -= 1.5 / d1) * x + 0.75;
+      } else if (x < 2.5 / d1) {
+        return n1 * (x -= 2.25 / d1) * x + 0.9375;
+      } else {
+        return n1 * (x -= 2.625 / d1) * x + 0.984375;
+      }
+    }
+
+    animate(1000, moveBall, bounceOut);
+  </script>
+</body>
+</html>
